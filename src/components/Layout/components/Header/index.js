@@ -11,6 +11,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import classNames from 'classnames/bind'
+import { Link } from 'react-router-dom'
 import 'tippy.js/dist/tippy.css'
 
 import images from '~/assets/images'
@@ -18,6 +19,7 @@ import Button from '~/components/Button'
 import { InboxIcon, MessageIcon, UploadIcon } from '~/components/Icons'
 import Image from '~/components/Image'
 import Menu from '~/components/Popper/Menu'
+import routesConfig from '~/config/routes'
 import Search from '../Search'
 import styles from './Header.module.scss'
 
@@ -55,7 +57,7 @@ const MENU_ITEMS = [
 ]
 
 function Header() {
-    const currentUser = false
+    const currentUser = true
 
     // Handle logic
     const handleMenuChange = (menuItem) => {
@@ -95,7 +97,9 @@ function Header() {
     return (
         <header className={cx('wrapper')}>
             <div className={cx('inner')}>
-                <img src={images.logo} alt="Tiktok" />
+                <Link to={routesConfig.home} className={cx('logo-link')}>
+                    <img src={images.logo} alt="Tiktok" />
+                </Link>
 
                 <Search />
                 <div className={cx('actions')}>

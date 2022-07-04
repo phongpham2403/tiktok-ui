@@ -7,7 +7,10 @@ import { SearchIcon } from '~/components/Icons'
 import { Wrapper as PopperWrapper } from '~/components/Popper'
 import styles from './Search.module.scss'
 
+import * as searchServices from '~/apiServices/searchServices'
+
 import { faCircleXmark, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { useDebounce } from '~/hooks'
 const cx = classNames.bind(styles)
 
 const Search = () => {
@@ -16,26 +19,26 @@ const Search = () => {
     const [showResult, setShowReasult] = useState(true)
     const [loading, setLoading] = useState(false)
 
+    const debounced = useDebounce(searchValue, 500)
+
     const inputRef = useRef()
 
     useEffect(() => {
-        if (!searchValue.trim()) {
+        if (!debounced.trim()) {
             setSearchResult([])
             return
         }
-        setLoading(true)
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=more`)
-            .then((res) => res.json())
-            .then((res) => {
-                setSearchResult(res.data)
-                setLoading(false)
-            })
-            .catch(() => {
-                setLoading(false)
-            })
-    }, [searchValue])
 
-    const handeleClear = () => {
+        const fetchApi = async () => {
+            setLoading(true)
+            const result = await searchServices.search(debounced)
+            setSearchResult(result)
+            setLoading(false)
+        }
+        fetchApi()
+    }, [debounced])
+
+    const handleClear = () => {
         setSearchValue('')
         inputRef.current.focus()
     }
@@ -43,6 +46,14 @@ const Search = () => {
     const handleHideResult = () => {
         setShowReasult(false)
     }
+
+    const handleChange = (e) => {
+        const searchValue = e.target.value
+        if (!searchValue.startsWith(' ')) {
+            setSearchValue(searchValue)
+        }
+    }
+
     return (
         <HeadlessTippy
             interactive
@@ -65,23 +76,17 @@ const Search = () => {
                     placeholder="Search accounts and videos"
                     spellCheck={false}
                     value={searchValue}
-                    onChange={(e) => {
-                        if (e.target.value.startsWith(' ')) {
-                            return
-                        } else {
-                            setSearchValue(e.target.value)
-                        }
-                    }}
+                    onChange={handleChange}
                     onFocus={() => setShowReasult(true)}
                 />
                 {!!searchValue && !loading && (
-                    <button className={cx('clear')} onClick={handeleClear}>
+                    <button className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}
                 {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}
 
-                <button className={cx('search-btn')}>
+                <button className={cx('search-btn')} onMouseDown={(e) => e.preventDefault()}>
                     <SearchIcon />
                 </button>
             </div>
