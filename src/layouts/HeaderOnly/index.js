@@ -1,4 +1,4 @@
-import Header from '~/components/Layout/components/Header';
+import Header from '~/layouts/components/Header'
 
 function HeaderOnly({ children }) {
     return (
@@ -8,7 +8,7 @@ function HeaderOnly({ children }) {
                 <div className="content">{children}</div>
             </div>
         </div>
-    );
+    )
 }
 
-export default HeaderOnly;
+export default HeaderOnly
